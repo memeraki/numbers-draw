@@ -1,0 +1,12 @@
+.App {
+  text-align: center;
+}
+
+.lotto-checkboxes {
+  max-width: 50%;
+  margin: 0 auto;
+}
+
+.lotto-checkboxes div{
+  display: inline-block;
+}
