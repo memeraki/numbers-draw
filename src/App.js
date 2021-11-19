@@ -1,3 +1,7 @@
+import { useState } from "react";
+import Combinations from './Modals/Combinations';
+import Histogram from './Modals/Histogram';
+
 import './App.css';
 
 function App() {
@@ -8,6 +12,10 @@ function App() {
                   31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
                   41, 42, 43, 44, 45, 46, 47, 48, 49];
 
+  
+  const [histogramModal, toggleHistogramModal] = useState(false);
+  const [combinationsModal, toggleCombinationsModal] = useState(false);
+
   const getNumbersCheckboxes = numbers => numbers.map(number => (
     <div key={number}>
       <input name={numbers} type="checkbox" id={number} />
@@ -15,14 +23,18 @@ function App() {
     </div>
   ));
 
+  const openModal = (e) => {
+    e.target.value === "histogram" ? toggleHistogramModal(!histogramModal) : toggleCombinationsModal(!combinationsModal);
+  }
+
   return (
     <div className="App">
       <header>
         <h1>simple lotto simulator</h1>
-        <nav>
-          histogram
-          combinations
-        </nav>
+        <div>
+        <button onClick={openModal} value="histogram">histogram</button>
+        <button onClick={openModal} value="combinations">combinations</button>
+        </div>
       </header>
       <main>
         <div className="lotto-buttons">
@@ -34,6 +46,18 @@ function App() {
         </div>
         <div className="results">results</div>
       </main>
+      <Histogram
+        isUp={histogramModal}
+        close={() => {
+        toggleHistogramModal(false);
+        }}
+      />
+      <Combinations
+        isUp={combinationsModal}
+        close={() => {
+        toggleCombinationsModal(false);
+        }}
+      />
     </div>
   );
 }
