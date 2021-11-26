@@ -13,14 +13,13 @@ function App() {
                   41, 42, 43, 44, 45, 46, 47, 48, 49];
 
   const [selected, setSelected] = useState([]);
+  const [drawn, setDrawn] = useState([]);
   
   const [histogramModal, toggleHistogramModal] = useState(false);
   const [combinationsModal, toggleCombinationsModal] = useState(false);
 
   useEffect(() => {
-    if(selected.length === 6) {
-      //disable checkboxes ??
-    }
+    disableUnchecked(); // think about this ;-)
   }, [selected])
 
   const getNumbersCheckboxes = numbers => numbers.map(number => (
@@ -30,7 +29,7 @@ function App() {
         type="checkbox" 
         id={number} 
         onChange={handleChange}/>
-      <label for={number}>{number}</label>
+      <label htmlFor={number}>{number}</label>
     </div>
   ));
 
@@ -46,14 +45,45 @@ function App() {
     setSelected(prevSelected => [...prevSelected.filter(n => n!== number)]);
   }
 
-  const handleChange = (e) => {
-    !e.target.checked ? removeFromSelected(e.target.id) : (selected.length < 6 ? addToSelected(e.target.id) : doNotAddToSelected(e));
-  }
-
   const doNotAddToSelected = (e) => {
     console.log("Selected 6 numbers. It is enought.");
     e.target.checked = false;
   }
+
+  const handleChange = (e) => {
+    !e.target.checked ? removeFromSelected(e.target.id) : (selected.length < 6 ? addToSelected(e.target.id) : doNotAddToSelected(e));
+  }
+
+  const disableUnchecked = () => {
+    Array.from(document.querySelectorAll("input[type=checkbox]"))
+       .forEach((checkbox) => {
+        !checkbox.checked && selected.length === 6 ? checkbox.disabled = true : checkbox.disabled = false;
+       });
+  }
+
+  const handleClear = (e) => {
+    setSelected([]);
+    Array.from(document.querySelectorAll("input[type=checkbox]"))
+       .forEach((checkbox) => {
+        checkbox.checked = false;
+       });
+  }
+
+  const handleDraw = () => {
+    let array = [];
+    for (let i = 0; i < 6; i++) {
+      array.push(getRandomNumber(array));
+    }
+    setDrawn(array);
+  }
+
+  const getRandomNumber = (excluded = []) => {
+    let num = 0;
+    do 
+      num = Math.floor(Math.random() * (49 - 1 + 1) + 1);
+    while ( excluded.includes(num) )
+    return num;
+  };
 
   return (
     <div className="App">
@@ -66,13 +96,14 @@ function App() {
       </header>
       <main>
         <div className="lotto-buttons">
-          <button>draw</button>
-          <button>clear</button>
+          {selected.length === 6 && <button onClick={handleDraw}>draw</button>}
+          <button onClick={handleClear}>clear</button>
         </div>
         <div className="lotto-checkboxes">
           {getNumbersCheckboxes(numbers)}
         </div>
-        <p>Wybrane: {selected.map(number => number+" ")}</p>
+        <p>Yours: {selected.sort((a,b) => a - b).map(number => number+" ")}</p>
+        <p>Last drawn: {drawn.sort((a,b) => a - b).map(number => number+" ")}</p>
         <div className="results">results</div>
       </main>
       <Histogram
