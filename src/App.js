@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Combinations from './Modals/Combinations';
 import Histogram from './Modals/Histogram';
 
@@ -14,6 +14,8 @@ function App() {
 
   const [selected, setSelected] = useState([]);
   const [drawn, setDrawn] = useState([]);
+  const [compared, setCompared] = useState({same: [], sum: -1});
+  const isMounted = useRef(false);
   
   const [histogramModal, toggleHistogramModal] = useState(false);
   const [combinationsModal, toggleCombinationsModal] = useState(false);
@@ -21,6 +23,14 @@ function App() {
   useEffect(() => {
     disableUnchecked(); // think about this ;-)
   }, [selected])
+
+  useEffect(() => {
+    if (isMounted.current) {
+      setCompared(compareArrays(selected, drawn));
+    } else {
+      isMounted.current = true;
+    }
+  }, [drawn])
 
   const getNumbersCheckboxes = numbers => numbers.map(number => (
     <div key={number}>
@@ -38,11 +48,11 @@ function App() {
   }
 
   const addToSelected = (number) => {
-    setSelected(prevSelected => [...prevSelected, number]);
+    setSelected(prevSelected => [...prevSelected, Number(number)]);
   }
 
   const removeFromSelected = (number) => {
-    setSelected(prevSelected => [...prevSelected.filter(n => n!== number)]);
+    setSelected(prevSelected => [...prevSelected.filter(n => n!== Number(number))]);
   }
 
   const doNotAddToSelected = (e) => {
@@ -85,6 +95,18 @@ function App() {
     return num;
   };
 
+  const compareArrays = (a, b) => {
+    let same = [];
+    let sum = 0;
+    a.forEach(num => {
+      if(b.includes(num)) {
+        same.push(num);
+        sum++;
+      }
+    });
+    return {same: same, sum: sum};
+  }
+
   return (
     <div className="App">
       <header>
@@ -102,9 +124,12 @@ function App() {
         <div className="lotto-checkboxes">
           {getNumbersCheckboxes(numbers)}
         </div>
-        <p>Yours: {selected.sort((a,b) => a - b).map(number => number+" ")}</p>
-        <p>Last drawn: {drawn.sort((a,b) => a - b).map(number => number+" ")}</p>
-        <div className="results">results</div>
+        {selected.length > 0 && <p>Yours: {selected.sort((a,b) => a - b).map(number => number+" ")}</p>}
+        {drawn.length > 0 && <p>Last drawn: {drawn.sort((a,b) => a - b).map(number => number+" ")}</p>}
+        {compared.sum !== -1 && <div className="results">
+          <p>you hit {compared.sum} numbers!</p>
+          {compared.sum > 0  && <p>Same: {compared.same.sort((a,b) => a - b).map(number => number+" ")}</p>}
+        </div>}
       </main>
       <Histogram
         isUp={histogramModal}
