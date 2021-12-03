@@ -20,13 +20,29 @@ function App() {
   const [histogramModal, toggleHistogramModal] = useState(false);
   const [combinationsModal, toggleCombinationsModal] = useState(false);
 
+  const [data, setData] = useState([]);
+  
+  useEffect(() => {
+    // https://justcors.com
+    let cors = "https://justcors.com/tl_bc01f9c/";
+    let file = "http://www.mbnet.com.pl/dl.txt";
+    fetch(cors + file)
+    .then((response) => response.text())
+    .then((result) => {
+      setData(result.split('\r\n').map(cur => cur.split(/ |,/).slice(2).map(el => Number(el))));
+    }).catch(error => {
+      setData("error");
+      console.log(error);
+    });
+  }, [])
+
   useEffect(() => {
     disableUnchecked(); // think about this ;-)
   }, [selected])
 
   useEffect(() => {
     if (isMounted.current) {
-      setCompared(compareArrays(selected, drawn));
+      drawn.length > 0 ? setCompared(compareArrays(selected, drawn)) : setCompared({same: [], sum: -1});
     } else {
       isMounted.current = true;
     }
@@ -56,7 +72,6 @@ function App() {
   }
 
   const doNotAddToSelected = (e) => {
-    console.log("Selected 6 numbers. It is enought.");
     e.target.checked = false;
   }
 
@@ -73,6 +88,7 @@ function App() {
 
   const handleClear = (e) => {
     setSelected([]);
+    setDrawn([]);
     Array.from(document.querySelectorAll("input[type=checkbox]"))
        .forEach((checkbox) => {
         checkbox.checked = false;
@@ -132,17 +148,19 @@ function App() {
         </div>}
       </main>
       <Histogram
+        data={data}
         isUp={histogramModal}
         close={() => {
         toggleHistogramModal(false);
         }}
       />
-      <Combinations
+      {data.length > 0 ? <Combinations
+        data={data}
         isUp={combinationsModal}
         close={() => {
         toggleCombinationsModal(false);
         }}
-      />
+      /> : <p>"Loading..."</p>}
     </div>
   );
 }

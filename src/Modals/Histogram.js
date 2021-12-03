@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-export function Histogram({ isUp, close }) {
+export function Histogram({ data, isUp, close }) {
 
   const handleEscape = useCallback(e => {
     if (e.keyCode === 27) close()
