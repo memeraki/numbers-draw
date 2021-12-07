@@ -38,15 +38,16 @@ function App() {
 
   useEffect(() => {
     disableUnchecked(); // think about this ;-)
-  }, [selected])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]) 
 
   useEffect(() => {
     if (isMounted.current) {
       drawn.length > 0 ? setCompared(compareArrays(selected, drawn)) : setCompared({same: [], sum: -1});
     } else {
       isMounted.current = true;
-    }
-  }, [drawn])
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawn]) 
 
   const getNumbersCheckboxes = numbers => numbers.map(number => (
     <div key={number}>
@@ -147,20 +148,20 @@ function App() {
           {compared.sum > 0  && <p>Same: {compared.same.sort((a,b) => a - b).map(number => number+" ")}</p>}
         </div>}
       </main>
-      <Histogram
+      {data.length > 0 && <Histogram
         data={data}
         isUp={histogramModal}
         close={() => {
         toggleHistogramModal(false);
         }}
-      />
-      {data.length > 0 ? <Combinations
+      />}
+      {data.length > 0 && <Combinations
         data={data}
         isUp={combinationsModal}
         close={() => {
         toggleCombinationsModal(false);
         }}
-      /> : <p>"Loading..."</p>}
+      />}
     </div>
   );
 }
