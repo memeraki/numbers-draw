@@ -38,6 +38,7 @@ export function Combinations({ data, isUp, close }) {
       setCounter(count);
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.unique]); 
+  
   const handleInputChange = (event) => {
     if(event.target.value > 49) event.target.value = 49;
     if(event.target.value < 1 && event.target.value!=="") event.target.value = 1;

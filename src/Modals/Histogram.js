@@ -6,13 +6,18 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  CartesianGrid
 } from "recharts";
 
 export function Histogram({ data, isUp, close }) {
 
   const [histogramData, setHistogramData] = useState([]);
   const [counter, setCounter] = useState([]);
+  const [sorted, setSorted] = useState([]);
+  const [displaySorted, setDisplaySorted] = useState(false);
+
+  const colors = ["#1E90FF", "#187DE9", "#126AD2", "#0C56BC", "#0643A5", "#00308F"];
 
   const handleEscape = useCallback(e => {
     if (e.keyCode === 27) close()
@@ -30,12 +35,19 @@ export function Histogram({ data, isUp, close }) {
 
   useEffect(() => {
     if(isUp) {
-      setCounter([])
+      setCounter([]);
+      setSorted([]);
       for(let i=1; i<50; i++) {
         setCounter(prev => [...prev, {number: i, value: count(i)}]);
       }
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [histogramData]); 
+
+  useEffect(() => {
+    if(isUp) {
+      setSorted([...counter].sort(( a, b ) => b.value - a.value));
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counter])
 
   const count = (a) => {
       let count = 0;
@@ -45,14 +57,35 @@ export function Histogram({ data, isUp, close }) {
       return count;
   };
 
-  function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
+  const handleSwitch = (event) => {
+    setDisplaySorted(!displaySorted);
+  };
+
+  const checkSwitch = () => {
+    return displaySorted === false ? counter : sorted;
+  };
+
+//   function getRandomColor() {
+//     // R G B
+//     let letters = '0123456789ABCDEF'.split('');
+//     let color = '#';
+//     for (let i = 0; i < 6; i++ ) {
+//         color += letters[Math.floor(Math.random() * 16)];
+//     }
+//     return color; // '#FFFF' +
+// }
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p className="label">{`number ${label} : ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
 
   return isUp ? (
     <div
@@ -69,18 +102,23 @@ export function Histogram({ data, isUp, close }) {
       >
         <button onClick={close}>Close</button>
         <h1>Histogram</h1>
+        <div className="switch-container">
+          <label className="switch"><input type="checkbox" onChange={handleSwitch}/><div></div></label>
+        </div>
         <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={counter}>
+          <BarChart data={checkSwitch()}>
             <XAxis dataKey="number" />
             <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" >
-                {data.map((entry, index) => (
-                  <Cell key={index} fill={getRandomColor()}/>
-                ))}
-              </Bar>
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="value">
+              {data.map((entry, index) => (
+                <Cell key={index} fill={colors[index % 6]} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
+        <p>...</p>
       </div>
     </div>
   ) : null;
