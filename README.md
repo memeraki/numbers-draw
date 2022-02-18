@@ -1,6 +1,6 @@
 # numbers-draw
 simple lotto simulator
 
-react project run with yarn start
+## [Live - visit to check it](https://memeraki.github.io/numbers-draw/)
 
-working but missing nice css style ;)
+still missing some css style ;)
