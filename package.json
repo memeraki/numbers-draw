@@ -13,7 +13,7 @@
     "recharts": "^2.1.6",
     "web-vitals": "^1.0.1"
   },
-  "homepage": "https://imię.github.io/nazwa",
+  "homepage": "https://memeraki.github.io/numbers-draw",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
